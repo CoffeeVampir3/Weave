@@ -1,0 +1,23 @@
+*
+
+# But not these files
+!.gitignore
+!main.cpp
+!CMakeLists.txt
+
+# Allow Shaders folder and its contents
+!Shaders/
+!Shaders/**
+
+# Allow Modules folder and its contents
+!Modules/
+!Modules/**
+
+# Allow 3P folder (but not its contents yet)
+!3P/
+
+# Allow specific subfolders in 3P
+!3P/vk-bootstrap/
+!3P/vk-bootstrap/**
+!3P/fastgltf/
+!3P/fastgltf/**
