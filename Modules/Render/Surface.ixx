@@ -10,7 +10,7 @@ import Logging;
 import Image;
 
 export namespace Weave {
-    auto createWindow(uint32_t width, uint32_t height) {
+    auto createWindow(const uint32_t width, const uint32_t height) {
         SDL_Init(SDL_INIT_VIDEO);
 
         SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);

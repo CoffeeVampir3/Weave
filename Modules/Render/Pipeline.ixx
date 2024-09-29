@@ -14,25 +14,9 @@ import Mesh;
 import Check;
 
 export namespace Weave {
-    struct ComputePushConstants {
-        glm::vec4 data1;
-        glm::vec4 data2;
-        glm::vec4 data3;
-        glm::vec4 data4;
-    };
-
-    struct ComputeEffect {
-        std::string name;
-
-        VkPipeline pipeline;
-        VkPipelineLayout layout;
-
-        ComputePushConstants data;
-    };
-
     VkPipelineShaderStageCreateInfo shaderStageCreateInfo(
-        VkShaderStageFlagBits stage, 
-        VkShaderModule module) {
+        const VkShaderStageFlagBits stage,
+        const VkShaderModule module) {
         return {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
             .pNext = nullptr,
@@ -42,71 +26,6 @@ export namespace Weave {
             .pName = "main",
             .pSpecializationInfo = nullptr,
         };
-    }
-
-    auto createBackgroundPipeline(vkb::Device vkbDevice, VkDescriptorSetLayout drawDescriptorLayout) {
-        VkPipelineLayout computePipelineLayout;
-
-        VkPushConstantRange pushConstant {
-            .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-            .offset = 0,
-            .size = sizeof(ComputePushConstants),
-        };
-
-        VkPipelineLayoutCreateInfo computeLayoutInfo {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-            .pNext = nullptr,
-            .setLayoutCount = 1,
-            .pSetLayouts = &drawDescriptorLayout,
-            .pushConstantRangeCount = 1,
-            .pPushConstantRanges = &pushConstant,
-        };
-
-        Check::vkResult(
-            vkCreatePipelineLayout(vkbDevice.device, &computeLayoutInfo, nullptr, &computePipelineLayout)
-        );
-        VkShaderModule gradientShader = loadShaderModule("Shaders/gradient.comp.spv", vkbDevice);
-        VkShaderModule skyShader = loadShaderModule("Shaders/sky.comp.spv", vkbDevice);
-
-        VkPipelineShaderStageCreateInfo stageinfo = shaderStageCreateInfo(VK_SHADER_STAGE_COMPUTE_BIT, gradientShader);
-
-        VkComputePipelineCreateInfo computePipelineCreateInfo {
-            .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .stage = stageinfo,
-            .layout = computePipelineLayout,
-        };
-
-        std::vector<ComputeEffect> effects {
-            {
-                .name = "Gradient",
-                .layout = computePipelineLayout,
-                .data {
-                    .data1 = glm::vec4(1, 0, 0, 1),
-                    .data2 = glm::vec4(0, 0, 1, 1)
-                }
-            },
-            {
-                .name = "Sky",
-                .layout = computePipelineLayout,
-                .data {
-                    .data1 = glm::vec4(0.1, 0.2, 0.4 ,0.97),
-                }
-            }
-        };
-
-        Check::vkResult(
-            vkCreateComputePipelines(vkbDevice.device,nullptr,1,&computePipelineCreateInfo, nullptr, &effects[0].pipeline)
-        );
-        computePipelineCreateInfo.stage.module = skyShader;
-        Check::vkResult(
-            vkCreateComputePipelines(vkbDevice.device,nullptr,1,&computePipelineCreateInfo, nullptr, &effects[1].pipeline)
-        );
-
-        vkDestroyShaderModule(vkbDevice.device, gradientShader, nullptr);
-        vkDestroyShaderModule(vkbDevice.device, skyShader, nullptr);
-        return std::tuple(computePipelineLayout, effects);
     }
 
     struct PipelineBuilder {
@@ -225,7 +144,7 @@ export namespace Weave {
             return *this;
         }
 
-        PipelineBuilder& enableDepthTest(bool depthWriteEnable, VkCompareOp op) {
+        PipelineBuilder& enableDepthTest(const bool depthWriteEnable, const VkCompareOp op) {
             depthStencil.depthTestEnable = VK_TRUE;
             depthStencil.depthWriteEnable = depthWriteEnable;
             depthStencil.depthCompareOp = op;
@@ -238,7 +157,7 @@ export namespace Weave {
             return *this;
         }
 
-        VkPipeline build(vkb::Device device) {
+        VkPipeline build(const vkb::Device& device) {
             VkPipelineViewportStateCreateInfo viewportState = {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
                 .viewportCount = 1,
@@ -303,7 +222,7 @@ export namespace Weave {
         }
     };
 
-    auto createTriangleMeshPipeline(vkb::Device device, Weave::AllocatedImage drawImage, Weave::AllocatedImage depthImage) {
+    auto createTriangleMeshPipeline(vkb::Device device, AllocatedImage drawImage, AllocatedImage depthImage) {
         VkPushConstantRange bufferRange{
             .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
             .offset = 0,

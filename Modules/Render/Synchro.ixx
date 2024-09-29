@@ -11,7 +11,8 @@ export namespace Weave {
         VkSemaphore swapchainSemaphore, renderSemaphore;
         VkFence renderFence;
 
-        void destroy(vkb::Device vkbDevice) {
+        void destroy(const vkb::Device& vkbDevice) const
+        {
             vkDestroyFence(vkbDevice.device, renderFence, nullptr);
             vkDestroySemaphore(vkbDevice.device, renderSemaphore, nullptr);
             vkDestroySemaphore(vkbDevice.device, swapchainSemaphore, nullptr);
@@ -37,7 +38,7 @@ export namespace Weave {
         };
     }
 
-    FrameSynchronizer createFrameSynchronizer(vkb::Device vkbDevice) {
+    FrameSynchronizer createFrameSynchronizer(const vkb::Device& vkbDevice) {
         VkFenceCreateInfo fenceInfo = fenceCreateInfo();
 
         VkSemaphoreCreateInfo semaphoreInfo = {

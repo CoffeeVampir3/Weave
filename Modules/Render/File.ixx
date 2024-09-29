@@ -7,7 +7,7 @@ import Logging;
 import Check;
 
 export namespace Weave {
-    VkShaderModule loadShaderModule(const std::filesystem::path& path, vkb::Device vkbDevice) {
+    VkShaderModule loadShaderModule(const std::filesystem::path& path, const vkb::Device& vkbDevice) {
         std::ifstream file(path, std::ios::ate | std::ios::binary);
 
         if (!file.is_open()) {

@@ -8,7 +8,7 @@ import Logging;
 import Check;
 
 export namespace Weave {
-    auto createSwapchain(uint32_t width, uint32_t height, vkb::Device vkbDevice, VkSurfaceKHR surface) {
+    auto createSwapchain(const uint32_t width, const uint32_t height, const vkb::Device& vkbDevice, VkSurfaceKHR surface) {
         vkb::SwapchainBuilder swapchainBuilder{ 
             vkbDevice,
             surface 
@@ -29,7 +29,7 @@ export namespace Weave {
         return vkbSwapchain.value();
     }
 
-    void resizeSwapchain(vkb::Device vkbDevice, vkb::Swapchain& swapchain, std::vector<VkImageView>& imageViews, VkSurfaceKHR surface, auto window) {
+    void resizeSwapchain(const vkb::Device& vkbDevice, vkb::Swapchain& swapchain, std::vector<VkImageView>& imageViews, VkSurfaceKHR surface, auto window) {
         int w, h;
         SDL_GetWindowSize(window, &w, &h);
         swapchain.destroy_image_views(imageViews);

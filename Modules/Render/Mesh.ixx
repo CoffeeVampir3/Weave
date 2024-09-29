@@ -24,7 +24,8 @@ export namespace Weave {
         AllocatedBuffer vertexBuffer;
         VkDeviceAddress vertexBufferAddress;
 
-        void destroy(VmaAllocator allocator) {
+        void destroy(const VmaAllocator allocator) const
+        {
             indexBuffer.destroy(allocator);
             vertexBuffer.destroy(allocator);
         }
@@ -48,7 +49,7 @@ export namespace Weave {
     };
 
     GPUMeshBuffer createMeshBuffer(
-        vkb::Device device, 
+        const vkb::Device& device,
         VkQueue graphicsQueue, 
         VmaAllocator allocator, 
         ImmediateCommander immediateCmd, 

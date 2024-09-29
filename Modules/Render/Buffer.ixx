@@ -13,13 +13,13 @@ export namespace Weave {
         VmaAllocation allocation;
         VmaAllocationInfo info;
 
-        void destroy(VmaAllocator allocator) const
+        void destroy(const VmaAllocator allocator) const
         {
             vmaDestroyBuffer(allocator, buffer, allocation);
         }
     };
 
-    AllocatedBuffer createBuffer(VmaAllocator allocator, const size_t allocSize, const VkBufferUsageFlags usage, const VmaMemoryUsage memoryUsage) {
+    AllocatedBuffer createBuffer(const VmaAllocator allocator, const size_t allocSize, const VkBufferUsageFlags usage, const VmaMemoryUsage memoryUsage) {
         const VkBufferCreateInfo bufferInfo = {
             .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
             .pNext = nullptr,

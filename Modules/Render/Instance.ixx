@@ -6,7 +6,7 @@ import std;
 import Logging;
 
 export namespace Weave {
-    auto createInstance(bool useValidationLayers) {
+    auto createInstance(const bool useValidationLayers) {
         vkb::InstanceBuilder builder;
 
         //make the vulkan instance, with basic debug features
@@ -16,7 +16,7 @@ export namespace Weave {
             .require_api_version(1, 3, 0)
             .build();
 
-        auto vkbInstance = maybeInstanceBuilder;
+        const auto& vkbInstance = maybeInstanceBuilder;
 
         if(!vkbInstance) {
             Logging::failure("Failed to create a vulkan instance.");

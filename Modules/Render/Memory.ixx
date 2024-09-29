@@ -23,7 +23,7 @@ export namespace Weave {
         std::stack<std::function<void()>> deletors;
     };
 
-    VmaAllocator createAllocator(vkb::Device vkbDevice, auto instance) {
+    VmaAllocator createAllocator(const vkb::Device& vkbDevice, auto instance) {
         VmaAllocator allocator;
         VmaAllocatorCreateInfo allocatorInfo = {
             .flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT,

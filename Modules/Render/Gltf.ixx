@@ -32,7 +32,7 @@ export namespace Weave {
         constexpr auto gltfOptions = fastgltf::Options::LoadExternalBuffers;
 
         auto gltfFile = fastgltf::MappedGltfFile::FromPath(filePath);
-        if (!bool(gltfFile)) {
+        if (!static_cast<bool>(gltfFile)) {
             Logging::failure("Failed to open mesh asset with gltf error: {}", std::source_location::current(), fastgltf::getErrorMessage(gltfFile.error()));
             abort();
         }

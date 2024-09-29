@@ -38,7 +38,7 @@ export namespace Weave {
         }
     };
 
-    VkRenderingAttachmentInfo renderingAttachmentInfo(VkImageView view, VkClearValue* clear, VkImageLayout layout) {
+    VkRenderingAttachmentInfo renderingAttachmentInfo(const VkImageView view, const VkClearValue* clear, const VkImageLayout layout) {
         return {
             .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
             .pNext = nullptr,
@@ -50,8 +50,8 @@ export namespace Weave {
         };
     }
 
-    VkRenderingInfo renderingInfo(VkExtent2D renderExtent, VkRenderingAttachmentInfo* colorAttachment,
-        VkRenderingAttachmentInfo* depthAttachment)
+    VkRenderingInfo renderingInfo(const VkExtent2D renderExtent, VkRenderingAttachmentInfo* colorAttachment,
+                                  VkRenderingAttachmentInfo* depthAttachment)
     {
         return {
             .sType = VK_STRUCTURE_TYPE_RENDERING_INFO,
@@ -65,8 +65,7 @@ export namespace Weave {
         };
     }
 
-    VkRenderingAttachmentInfo depthAttachmentInfo(
-        VkImageView view, VkImageLayout layout /*= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL*/)
+    VkRenderingAttachmentInfo depthAttachmentInfo(const VkImageView view, const VkImageLayout layout)
     {
         return {
             .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
@@ -83,23 +82,12 @@ export namespace Weave {
         };
     }
 
-    void drawImgui(vkb::Swapchain swapchain, VkCommandBuffer cmd, VkImageView view) {
+    void drawImgui(const vkb::Swapchain& swapchain, const VkCommandBuffer cmd, const VkImageView view) {
         auto colorAttachment = renderingAttachmentInfo(view, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         auto renderInfo = renderingInfo(swapchain.extent, &colorAttachment, nullptr);
         vkCmdBeginRendering(cmd, &renderInfo);
         ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd);
         vkCmdEndRendering(cmd);
-    }
-
-    void drawBackground(vkb::Swapchain swapchain, VkCommandBuffer commandBuffer, Weave::ComputeEffect computeEffect, VkDescriptorSet descriptorSet) {
-    	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, computeEffect.pipeline);
-
-        // bind the descriptor set containing the draw image for the compute pipeline
-        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, computeEffect.layout, 0, 1, &descriptorSet, 0, nullptr);
-
-        vkCmdPushConstants(commandBuffer, computeEffect.layout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(ComputePushConstants), &computeEffect.data);
-        // execute the compute pipeline dispatch. We are using 16x16 workgroup size so we need to divide by it
-        vkCmdDispatch(commandBuffer, std::ceil(swapchain.extent.width / 16.0), std::ceil(swapchain.extent.height / 16.0), 1);
     }
 
     void drawGeometry(

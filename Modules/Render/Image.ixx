@@ -15,13 +15,14 @@ export namespace Weave {
         VkExtent3D imageExtent;
         VkFormat imageFormat;
 
-        void destroy(vkb::Device vkbDevice, VmaAllocator allocator) {
+        void destroy(const vkb::Device& vkbDevice, const VmaAllocator allocator) const
+        {
             vkDestroyImageView(vkbDevice.device, imageView, nullptr);
             vmaDestroyImage(allocator, image, allocation);
         }
     };
 
-    VkImageSubresourceRange imageSubresourceRange(VkImageAspectFlags aspectMask)
+    VkImageSubresourceRange imageSubresourceRange(const VkImageAspectFlags aspectMask)
     {
         return {
             .aspectMask = aspectMask,
@@ -32,7 +33,7 @@ export namespace Weave {
         };
     }
 
-    VkImageCreateInfo createImageInfo(VkFormat format, VkImageUsageFlags usageFlags, VkExtent3D extent) {
+    VkImageCreateInfo createImageInfo(const VkFormat format, const VkImageUsageFlags usageFlags, const VkExtent3D extent) {
         return {
             .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
             .pNext = nullptr,
@@ -52,7 +53,7 @@ export namespace Weave {
         };
     }
 
-    VkImageViewCreateInfo createImageViewInfo(VkFormat format, VkImage image, VkImageAspectFlags aspectFlags) {
+    VkImageViewCreateInfo createImageViewInfo(const VkFormat format, const VkImage image, const VkImageAspectFlags aspectFlags) {
         return {
             .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
             .pNext = nullptr,
@@ -69,7 +70,7 @@ export namespace Weave {
         };
     }
 
-    void transitionImage(VkCommandBuffer cmd, VkImage image, VkImageLayout currentLayout, VkImageLayout newLayout) {
+    void transitionImage(const VkCommandBuffer cmd, const VkImage image, const VkImageLayout currentLayout, const VkImageLayout newLayout) {
         VkImageAspectFlags aspectMask = 
             (newLayout == VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL) 
             ? VK_IMAGE_ASPECT_DEPTH_BIT 
@@ -97,7 +98,12 @@ export namespace Weave {
         vkCmdPipelineBarrier2(cmd, &depInfo);
     }
 
-    void copyImageToImage(VkCommandBuffer cmd, VkImage source, VkImage destination, VkExtent3D srcSize, VkExtent3D dstSize) {
+    void copyImageToImage(
+        const VkCommandBuffer cmd,
+        const VkImage source,
+        const VkImage destination,
+        const VkExtent3D srcSize,
+        const VkExtent3D dstSize) {
         VkImageBlit2 blitRegion{ .sType = VK_STRUCTURE_TYPE_IMAGE_BLIT_2, .pNext = nullptr };
 
         blitRegion.srcOffsets[1].x = srcSize.width;
@@ -134,12 +140,12 @@ export namespace Weave {
     }
 
     auto createSwapchainImage(
-        auto vkbDevice, 
-        auto vkbSwapchain, 
-        auto allocator, 
-        VkFormat format, 
-        VkImageUsageFlags usageFlags, 
-        VkImageAspectFlags aspectFlags) {
+        const vkb::Device& vkbDevice,
+        const vkb::Swapchain& vkbSwapchain,
+        const VmaAllocator allocator,
+        const VkFormat format,
+        const VkImageUsageFlags usageFlags,
+        const VkImageAspectFlags aspectFlags) {
         VkExtent3D drawImageExtent = {
             vkbSwapchain.extent.width,
             vkbSwapchain.extent.height,
@@ -155,13 +161,13 @@ export namespace Weave {
         //for the draw image, we want to allocate it from gpu local memory
         VmaAllocationCreateInfo allocInfo = {};
         allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-        allocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        allocInfo.requiredFlags = static_cast<VkMemoryPropertyFlags>(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
         //allocate and create the image
         vmaCreateImage(allocator, &imgInfo, &allocInfo, &image.image, &image.allocation, nullptr);
 
         //VK_IMAGE_ASPECT_COLOR_BIT
-        //build a image-view for the draw image to use for rendering
+        //build an image-view for the draw image to use for rendering
         VkImageViewCreateInfo viewInfo = createImageViewInfo(image.imageFormat, image.image, aspectFlags);
 
         Check::vkResult(

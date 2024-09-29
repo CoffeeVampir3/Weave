@@ -8,7 +8,7 @@ import Synchro;
 import Check;
 
 export namespace Weave {
-    VkCommandBufferBeginInfo commandBufferBeginInfo(VkCommandBufferUsageFlags flags /*= 0*/) {
+    VkCommandBufferBeginInfo commandBufferBeginInfo(const VkCommandBufferUsageFlags flags) {
         return {
             .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
             .pNext = nullptr,
@@ -17,7 +17,7 @@ export namespace Weave {
         };
     }
 
-    VkCommandBufferSubmitInfo commandBufferSubmitInfo(VkCommandBuffer cmd){
+    VkCommandBufferSubmitInfo commandBufferSubmitInfo(const VkCommandBuffer cmd){
         return {
             .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO,
             .pNext = nullptr,
@@ -26,7 +26,7 @@ export namespace Weave {
         };
     }
 
-    VkCommandBufferAllocateInfo commandBufferAllocateInfo(VkCommandPool pool) {
+    VkCommandBufferAllocateInfo commandBufferAllocateInfo(const VkCommandPool pool) {
         return {
             .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
             .pNext = nullptr,
@@ -64,7 +64,7 @@ export namespace Weave {
         VkCommandBuffer buffer;
     };
 
-    FrameCommandBuffer createPrimaryCommandBuffer(vkb::Device vkbDevice, auto graphicsQueueFamily) {
+    FrameCommandBuffer createPrimaryCommandBuffer(const vkb::Device vkbDevice, auto graphicsQueueFamily) {
         VkCommandPoolCreateInfo commandPoolInfo = commandPoolCreateInfo(graphicsQueueFamily);
         FrameCommandBuffer cmdBuffer;
 
@@ -103,12 +103,13 @@ export namespace Weave {
             );
         }
 
-        void destroy(vkb::Device vkbDevice) {
+        void destroy(const vkb::Device& vkbDevice) const
+        {
             vkDestroyCommandPool(vkbDevice.device, pool, nullptr);
             vkDestroyFence(vkbDevice.device, fence, nullptr);
         }
 
-        void submit(vkb::Device vkbDevice, auto graphicsQueue, std::function<void(VkCommandBuffer cmd)>&& function) {
+        void submit(const vkb::Device vkbDevice, auto graphicsQueue, std::function<void(VkCommandBuffer cmd)>&& function) {
             vkResetFences(vkbDevice.device, 1, &fence);
             vkResetCommandBuffer(buffer, 0);
 
